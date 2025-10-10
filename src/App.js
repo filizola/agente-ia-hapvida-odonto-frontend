@@ -188,7 +188,7 @@ const Dashboard = () => {
         )}
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-7 gap-4 mb-8">
           <div 
             className={`bg-white overflow-hidden shadow rounded-lg cursor-pointer transition-all hover:shadow-lg transform hover:scale-105 ${
               activeFilter === "all" ? "ring-2 ring-blue-500 shadow-lg" : ""
