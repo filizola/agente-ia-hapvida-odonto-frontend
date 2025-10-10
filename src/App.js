@@ -15,7 +15,9 @@ const Dashboard = () => {
     cold_leads: 0,
     today_leads: 0,
     human_contacted: 0,
-    not_contacted: 0
+    not_contacted: 0,
+    sales_closed: 0,
+    no_sale: 0
   });
   const [leads, setLeads] = useState([]);
   const [filteredLeads, setFilteredLeads] = useState([]);
