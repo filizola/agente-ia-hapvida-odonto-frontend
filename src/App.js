@@ -556,20 +556,46 @@ const Dashboard = () => {
                             {lead.plan_interest}
                           </span>
                         )}
-                        <button
-                          onClick={(e) => toggleHumanContact(lead.id, lead.human_contacted, e)}
-                          className={`text-xs px-2 py-1 rounded transition-colors ${
-                            lead.human_contacted 
-                              ? "bg-purple-100 text-purple-800 hover:bg-purple-200" 
-                              : "bg-orange-100 text-orange-800 hover:bg-orange-200"
-                          }`}
-                          title={lead.human_contacted ? "Marcar como não contactado" : "Marcar como contactado"}
-                        >
-                          {lead.human_contacted ? "✅ Contactado" : "⏳ Não contactado"}
-                        </button>
+                        <div className="flex flex-col space-y-1">
+                          <button
+                            onClick={(e) => toggleHumanContact(lead.id, lead.human_contacted, e)}
+                            className={`text-xs px-2 py-1 rounded transition-colors ${
+                              lead.human_contacted 
+                                ? "bg-purple-100 text-purple-800 hover:bg-purple-200" 
+                                : "bg-orange-100 text-orange-800 hover:bg-orange-200"
+                            }`}
+                            title={lead.human_contacted ? "Marcar como não contactado" : "Marcar como contactado"}
+                          >
+                            {lead.human_contacted ? "✅ Contactado" : "⏳ Não contactado"}
+                          </button>
+                          
+                          <button
+                            onClick={(e) => toggleSaleStatus(lead.id, lead.sale_closed, e)}
+                            className={`text-xs px-2 py-1 rounded transition-colors ${
+                              lead.sale_closed 
+                                ? "bg-green-100 text-green-800 hover:bg-green-200" 
+                                : "bg-red-100 text-red-800 hover:bg-red-200"
+                            }`}
+                            title={lead.sale_closed ? "Desmarcar venda" : "Marcar como venda fechada"}
+                          >
+                            {lead.sale_closed ? "💰 Venda fechada" : "❌ Sem venda"}
+                          </button>
+                        </div>
+                        
                         {lead.human_contacted && lead.human_contact_date && (
                           <span className="text-xs text-gray-400">
                             Contactado em {formatDate(lead.human_contact_date)}
+                          </span>
+                        )}
+                        
+                        {lead.sale_closed && lead.sale_date && (
+                          <span className="text-xs text-gray-400">
+                            Venda: {formatDate(lead.sale_date)}
+                            {lead.sale_amount && (
+                              <span className="block text-green-600 font-medium">
+                                R$ {lead.sale_amount.toFixed(2)}
+                              </span>
+                            )}
                           </span>
                         )}
                       </div>
