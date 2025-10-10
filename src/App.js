@@ -660,8 +660,14 @@ const Calendar = () => {
           <div className="lg:col-span-2 bg-white shadow rounded-lg">
             <div className="px-6 py-4 border-b border-gray-200">
               <h3 className="text-lg font-medium text-gray-900">
-                Agendamentos - {formatDate(selectedDate)}
+                Agendamentos - {filterType === "date" ? formatDate(selectedDate) : 
+                  filterType === "month" && selectedMonth ? 
+                    new Date(selectedMonth + "-01").toLocaleDateString('pt-BR', { year: 'numeric', month: 'long' }) :
+                    "Todos"}
               </h3>
+              <p className="text-sm text-gray-500 mt-1">
+                {appointments.length} agendamento{appointments.length !== 1 ? 's' : ''} encontrado{appointments.length !== 1 ? 's' : ''}
+              </p>
             </div>
             <div className="divide-y divide-gray-200">
               {appointments.length > 0 ? (
