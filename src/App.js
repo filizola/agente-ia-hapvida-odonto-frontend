@@ -434,6 +434,8 @@ const Dashboard = () => {
                       {activeFilter === "warm" && "Nenhum lead morno encontrado"}
                       {activeFilter === "cold" && "Nenhum lead frio encontrado"}
                       {activeFilter === "today" && "Nenhum lead criado hoje"}
+                      {activeFilter === "contacted" && "Nenhum lead foi contactado ainda"}
+                      {activeFilter === "not_contacted" && "Todos os leads já foram contactados"}
                     </p>
                     {activeFilter !== "all" && (
                       <button
