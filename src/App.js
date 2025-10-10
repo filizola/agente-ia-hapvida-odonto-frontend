@@ -1550,6 +1550,7 @@ function App() {
               {/* Content */}
               {currentView === "dashboard" && <Dashboard />}
               {currentView === "calendar" && <Calendar />}
+              {currentView === "plans" && <PlansManager />}
               {currentView === "reports" && <Reports />}
               {currentView === "whatsapp" && <WhatsAppSetup />}
             </div>
