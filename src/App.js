@@ -65,6 +65,12 @@ const Dashboard = () => {
         const today = new Date().toISOString().split('T')[0];
         filtered = leads.filter(lead => lead.created_at.startsWith(today));
         break;
+      case "contacted":
+        filtered = leads.filter(lead => lead.human_contacted === true);
+        break;
+      case "not_contacted":
+        filtered = leads.filter(lead => lead.human_contacted !== true);
+        break;
       default:
         filtered = leads;
     }
