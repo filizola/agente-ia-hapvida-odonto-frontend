@@ -586,6 +586,290 @@ const WhatsAppSetup = () => {
   );
 };
 
+// Plans Management Component
+const PlansManager = () => {
+  const [plans, setPlans] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [editingPlan, setEditingPlan] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    price: '',
+    description: '',
+    features: [''],
+    is_popular: false
+  });
+
+  useEffect(() => {
+    fetchPlans();
+  }, []);
+
+  const fetchPlans = async () => {
+    try {
+      const response = await axios.get(`${API}/plans`);
+      setPlans(response.data);
+      setLoading(false);
+    } catch (error) {
+      console.error('Erro ao buscar planos:', error);
+      setLoading(false);
+    }
+  };
+
+  const handleEdit = (plan) => {
+    setEditingPlan(plan);
+    setFormData({
+      name: plan.name,
+      price: plan.price.toString(),
+      description: plan.description,
+      features: [...plan.features],
+      is_popular: plan.is_popular
+    });
+    setShowEditModal(true);
+  };
+
+  const handleSave = async () => {
+    try {
+      const updatedPlan = {
+        ...formData,
+        price: parseFloat(formData.price),
+        features: formData.features.filter(f => f.trim() !== '')
+      };
+
+      await axios.put(`${API}/plans/${editingPlan.id}`, updatedPlan);
+      
+      alert('Plano atualizado com sucesso!');
+      setShowEditModal(false);
+      setEditingPlan(null);
+      fetchPlans();
+    } catch (error) {
+      console.error('Erro ao atualizar plano:', error);
+      alert('Erro ao atualizar plano');
+    }
+  };
+
+  const addFeature = () => {
+    setFormData({
+      ...formData,
+      features: [...formData.features, '']
+    });
+  };
+
+  const updateFeature = (index, value) => {
+    const newFeatures = [...formData.features];
+    newFeatures[index] = value;
+    setFormData({
+      ...formData,
+      features: newFeatures
+    });
+  };
+
+  const removeFeature = (index) => {
+    const newFeatures = formData.features.filter((_, i) => i !== index);
+    setFormData({
+      ...formData,
+      features: newFeatures
+    });
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Carregando planos...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Gerenciar Planos Odontológicos</h1>
+          <p className="text-gray-600">Atualize valores, descrições e características dos planos</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {plans.map((plan) => (
+            <div key={plan.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900">{plan.name}</h3>
+                  {plan.is_popular && (
+                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+                      Popular
+                    </span>
+                  )}
+                </div>
+                
+                <div className="mb-4">
+                  <span className="text-2xl font-bold text-blue-600">
+                    R$ {plan.price.toFixed(2).replace('.', ',')}
+                  </span>
+                  <span className="text-gray-500 ml-1">/mês</span>
+                </div>
+                
+                <p className="text-gray-600 text-sm mb-4">{plan.description}</p>
+                
+                <div className="space-y-2 mb-6">
+                  {plan.features.map((feature, index) => (
+                    <div key={index} className="flex items-center text-sm text-gray-700">
+                      <span className="text-green-500 mr-2">✓</span>
+                      {feature}
+                    </div>
+                  ))}
+                </div>
+                
+                <button
+                  onClick={() => handleEdit(plan)}
+                  className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
+                >
+                  Editar Plano
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Edit Modal */}
+        {showEditModal && (
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4 max-h-96 overflow-y-auto">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">
+                Editar {editingPlan?.name}
+              </h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Nome do Plano
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Preço (R$)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={formData.price}
+                    onChange={(e) => setFormData({...formData, price: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Descrição
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.description}
+                    onChange={(e) => setFormData({...formData, description: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Características
+                  </label>
+                  {formData.features.map((feature, index) => (
+                    <div key={index} className="flex items-center space-x-2 mb-2">
+                      <input
+                        type="text"
+                        value={feature}
+                        onChange={(e) => updateFeature(index, e.target.value)}
+                        placeholder="Digite uma característica"
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                      {formData.features.length > 1 && (
+                        <button
+                          onClick={() => removeFeature(index)}
+                          className="text-red-600 hover:text-red-800"
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  <button
+                    onClick={addFeature}
+                    className="text-blue-600 hover:text-blue-800 text-sm"
+                  >
+                    + Adicionar característica
+                  </button>
+                </div>
+
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="is_popular"
+                    checked={formData.is_popular}
+                    onChange={(e) => setFormData({...formData, is_popular: e.target.checked})}
+                    className="mr-2"
+                  />
+                  <label htmlFor="is_popular" className="text-sm text-gray-700">
+                    Marcar como popular
+                  </label>
+                </div>
+              </div>
+
+              <div className="flex space-x-3 pt-6">
+                <button
+                  onClick={() => setShowEditModal(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleSave}
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                >
+                  Salvar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Info Section */}
+        <div className="mt-8 bg-white rounded-lg shadow p-6">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">ℹ️ Como Funciona</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h4 className="font-medium text-gray-900 mb-2">Atualizações em Tempo Real</h4>
+              <ul className="text-sm text-gray-600 space-y-1">
+                <li>• Valores são atualizados automaticamente no agente IA</li>
+                <li>• Novas conversas usam preços atualizados</li>
+                <li>• Características são incluídas nas apresentações</li>
+                <li>• Plano popular é destacado nas ofertas</li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-medium text-gray-900 mb-2">Dicas de Uso</h4>
+              <ul className="text-sm text-gray-600 space-y-1">
+                <li>• Use descrições claras e atrativas</li>
+                <li>• Mantenha características objetivas</li>
+                <li>• Marque apenas 1 plano como popular</li>
+                <li>• Atualize preços conforme necessário</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Reports Component
 const Reports = () => {
   const [isGenerating, setIsGenerating] = useState(false);
