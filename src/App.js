@@ -98,6 +98,29 @@ const Dashboard = () => {
     fetchConversation(lead.id);
   };
 
+  const toggleHumanContact = async (leadId, currentStatus, event) => {
+    event.stopPropagation(); // Evitar que o click do lead seja acionado
+    
+    try {
+      const notes = !currentStatus ? prompt("Adicionar observações sobre o contato (opcional):") : null;
+      
+      await axios.put(`${API}/leads/${leadId}/human-contact`, {
+        human_contacted: !currentStatus,
+        notes: notes || undefined
+      });
+      
+      // Atualizar os dados
+      await fetchDashboardData();
+      
+      const statusText = !currentStatus ? "marcado como contactado" : "desmarcado";
+      alert(`Lead ${statusText} com sucesso!`);
+      
+    } catch (error) {
+      console.error("Erro ao atualizar contato humano:", error);
+      alert("Erro ao atualizar status de contato");
+    }
+  };
+
   const getInterestColor = (level) => {
     switch (level) {
       case "hot": return "text-red-600 bg-red-100";
