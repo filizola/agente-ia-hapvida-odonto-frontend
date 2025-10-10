@@ -1513,6 +1513,16 @@ function App() {
                         Calendário
                       </button>
                       <button
+                        onClick={() => setCurrentView("plans")}
+                        className={`px-3 py-2 rounded ${
+                          currentView === "plans" 
+                            ? "bg-blue-800" 
+                            : "hover:bg-blue-700"
+                        }`}
+                      >
+                        Planos
+                      </button>
+                      <button
                         onClick={() => setCurrentView("reports")}
                         className={`px-3 py-2 rounded ${
                           currentView === "reports" 
