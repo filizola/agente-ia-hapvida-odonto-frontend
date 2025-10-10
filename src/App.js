@@ -444,6 +444,322 @@ const WhatsAppSetup = () => {
   );
 };
 
+// Calendar Component
+const Calendar = () => {
+  const [appointments, setAppointments] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [availableSlots, setAvailableSlots] = useState([]);
+  const [showAppointmentModal, setShowAppointmentModal] = useState(false);
+  const [newAppointment, setNewAppointment] = useState({
+    customer_name: "",
+    customer_email: "",
+    phone_number: "",
+    preferred_time: "",
+    consultation_type: "dental_plan",
+    notes: ""
+  });
+
+  useEffect(() => {
+    fetchAppointments();
+    fetchAvailableSlots();
+  }, [selectedDate]);
+
+  const fetchAppointments = async () => {
+    try {
+      const dateStr = selectedDate.toISOString().split('T')[0];
+      const response = await axios.get(`${API}/appointments?date=${dateStr}`);
+      setAppointments(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar agendamentos:", error);
+    }
+  };
+
+  const fetchAvailableSlots = async () => {
+    try {
+      const dateStr = selectedDate.toISOString().split('T')[0];
+      const response = await axios.get(`${API}/appointments/available-slots?date=${dateStr}`);
+      setAvailableSlots(response.data.available_slots);
+    } catch (error) {
+      console.error("Erro ao buscar horários disponíveis:", error);
+    }
+  };
+
+  const handleCreateAppointment = async (e) => {
+    e.preventDefault();
+    try {
+      const dateStr = selectedDate.toISOString().split('T')[0];
+      const response = await axios.post(`${API}/appointments`, {
+        ...newAppointment,
+        preferred_date: dateStr
+      });
+      
+      if (response.data.success) {
+        alert("Agendamento criado com sucesso!");
+        setShowAppointmentModal(false);
+        setNewAppointment({
+          customer_name: "",
+          customer_email: "",
+          phone_number: "",
+          preferred_time: "",
+          consultation_type: "dental_plan",
+          notes: ""
+        });
+        fetchAppointments();
+        fetchAvailableSlots();
+      } else {
+        alert(response.data.message);
+      }
+    } catch (error) {
+      console.error("Erro ao criar agendamento:", error);
+      alert("Erro ao criar agendamento");
+    }
+  };
+
+  const updateAppointmentStatus = async (appointmentId, status) => {
+    try {
+      await axios.put(`${API}/appointments/${appointmentId}/status`, { status });
+      fetchAppointments();
+    } catch (error) {
+      console.error("Erro ao atualizar status:", error);
+    }
+  };
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('pt-BR');
+  };
+
+  const formatTime = (time) => {
+    return time;
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "scheduled": return "bg-yellow-100 text-yellow-800";
+      case "confirmed": return "bg-blue-100 text-blue-800";
+      case "completed": return "bg-green-100 text-green-800";
+      case "cancelled": return "bg-red-100 text-red-800";
+      case "no_show": return "bg-gray-100 text-gray-800";
+      default: return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Calendário de Agendamentos</h1>
+          <p className="text-gray-600">Gerencie consultas e atendimentos com leads</p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Calendar Selector */}
+          <div className="bg-white shadow rounded-lg p-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Selecionar Data</h3>
+            <input
+              type="date"
+              value={selectedDate.toISOString().split('T')[0]}
+              onChange={(e) => setSelectedDate(new Date(e.target.value))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            
+            <div className="mt-6">
+              <h4 className="text-sm font-medium text-gray-900 mb-3">Horários Disponíveis</h4>
+              <div className="grid grid-cols-2 gap-2">
+                {availableSlots.map((slot, index) => (
+                  <button
+                    key={index}
+                    onClick={() => {
+                      setNewAppointment({...newAppointment, preferred_time: slot});
+                      setShowAppointmentModal(true);
+                    }}
+                    className="px-3 py-2 text-sm bg-green-100 text-green-800 rounded hover:bg-green-200 transition-colors"
+                  >
+                    {slot}
+                  </button>
+                ))}
+              </div>
+              {availableSlots.length === 0 && (
+                <p className="text-sm text-gray-500">Nenhum horário disponível</p>
+              )}
+            </div>
+
+            <button
+              onClick={() => setShowAppointmentModal(true)}
+              className="mt-6 w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+            >
+              Novo Agendamento
+            </button>
+          </div>
+
+          {/* Appointments List */}
+          <div className="lg:col-span-2 bg-white shadow rounded-lg">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h3 className="text-lg font-medium text-gray-900">
+                Agendamentos - {formatDate(selectedDate)}
+              </h3>
+            </div>
+            <div className="divide-y divide-gray-200">
+              {appointments.length > 0 ? (
+                appointments.map((appointment) => (
+                  <div key={appointment.id} className="px-6 py-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-3">
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">
+                              {appointment.customer_name || `Cliente ${appointment.phone_number.slice(-4)}`}
+                            </p>
+                            <p className="text-sm text-gray-500">{appointment.phone_number}</p>
+                          </div>
+                        </div>
+                        <div className="mt-2 flex items-center space-x-4">
+                          <span className="text-sm text-gray-600">
+                            🕐 {formatTime(appointment.appointment_time)}
+                          </span>
+                          <span className="text-sm text-gray-600">
+                            📞 {appointment.consultation_type}
+                          </span>
+                        </div>
+                        {appointment.notes && (
+                          <p className="mt-1 text-sm text-gray-600">
+                            📝 {appointment.notes}
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex flex-col items-end space-y-2">
+                        <span className={`px-2 py-1 text-xs font-medium rounded ${getStatusColor(appointment.status)}`}>
+                          {appointment.status.toUpperCase()}
+                        </span>
+                        <div className="flex space-x-1">
+                          {appointment.status === "scheduled" && (
+                            <button
+                              onClick={() => updateAppointmentStatus(appointment.id, "confirmed")}
+                              className="px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
+                            >
+                              Confirmar
+                            </button>
+                          )}
+                          {(appointment.status === "scheduled" || appointment.status === "confirmed") && (
+                            <button
+                              onClick={() => updateAppointmentStatus(appointment.id, "completed")}
+                              className="px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700"
+                            >
+                              Finalizar
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="px-6 py-12 text-center text-gray-500">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span className="text-2xl">📅</span>
+                  </div>
+                  <p>Nenhum agendamento para esta data</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Modal for New Appointment */}
+        {showAppointmentModal && (
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Novo Agendamento</h3>
+              <form onSubmit={handleCreateAppointment} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Nome do Cliente
+                  </label>
+                  <input
+                    type="text"
+                    value={newAppointment.customer_name}
+                    onChange={(e) => setNewAppointment({...newAppointment, customer_name: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Telefone *
+                  </label>
+                  <input
+                    type="tel"
+                    required
+                    value={newAppointment.phone_number}
+                    onChange={(e) => setNewAppointment({...newAppointment, phone_number: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    value={newAppointment.customer_email}
+                    onChange={(e) => setNewAppointment({...newAppointment, customer_email: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Horário *
+                  </label>
+                  <select
+                    required
+                    value={newAppointment.preferred_time}
+                    onChange={(e) => setNewAppointment({...newAppointment, preferred_time: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Selecione um horário</option>
+                    {availableSlots.map((slot, index) => (
+                      <option key={index} value={slot}>{slot}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Observações
+                  </label>
+                  <textarea
+                    value={newAppointment.notes}
+                    onChange={(e) => setNewAppointment({...newAppointment, notes: e.target.value})}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div className="flex space-x-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowAppointmentModal(false)}
+                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  >
+                    Agendar
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 // Main App Component
 function App() {
   const [currentView, setCurrentView] = useState("dashboard");
