@@ -238,6 +238,8 @@ const Dashboard = () => {
                   {activeFilter === "today" && "Leads de Hoje"}
                   {activeFilter === "contacted" && "Leads Contactados"}
                   {activeFilter === "not_contacted" && "Leads Não Contactados"}
+                  {activeFilter === "sales_closed" && "Vendas Fechadas"}
+                  {activeFilter === "no_sale" && "Sem Venda"}
                 </span>
                 <span className="ml-2 bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm">
                   {filteredLeads.length} encontrado{filteredLeads.length !== 1 ? 's' : ''}
