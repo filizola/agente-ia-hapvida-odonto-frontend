@@ -444,6 +444,225 @@ const WhatsAppSetup = () => {
   );
 };
 
+// Reports Component
+const Reports = () => {
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
+
+  const downloadLeadsReport = async () => {
+    setIsGenerating(true);
+    try {
+      const response = await axios.get(`${API}/reports/leads/excel`, {
+        responseType: 'blob'
+      });
+      
+      // Criar link de download
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      
+      // Extrair nome do arquivo do header
+      const contentDisposition = response.headers['content-disposition'];
+      const filename = contentDisposition 
+        ? contentDisposition.split('filename=')[1].replace(/"/g, '')
+        : `relatorio_leads_${new Date().toISOString().slice(0, 10)}.xlsx`;
+      
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      
+      alert('Relatório de leads baixado com sucesso!');
+    } catch (error) {
+      console.error('Erro ao baixar relatório de leads:', error);
+      alert('Erro ao gerar relatório de leads');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const downloadAppointmentsReport = async () => {
+    setIsGenerating(true);
+    try {
+      const url = selectedMonth ? 
+        `${API}/reports/appointments/excel?month=${selectedMonth}` :
+        `${API}/reports/appointments/excel`;
+        
+      const response = await axios.get(url, {
+        responseType: 'blob'
+      });
+      
+      // Criar link de download
+      const downloadUrl = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      
+      // Extrair nome do arquivo do header
+      const contentDisposition = response.headers['content-disposition'];
+      const filename = contentDisposition 
+        ? contentDisposition.split('filename=')[1].replace(/"/g, '')
+        : `relatorio_agendamentos_${new Date().toISOString().slice(0, 10)}.xlsx`;
+      
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(downloadUrl);
+      
+      alert('Relatório de agendamentos baixado com sucesso!');
+    } catch (error) {
+      console.error('Erro ao baixar relatório de agendamentos:', error);
+      alert('Erro ao gerar relatório de agendamentos');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Relatórios e Exportação</h1>
+          <p className="text-gray-600">Gere relatórios detalhados em formato Excel</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Relatório de Leads */}
+          <div className="bg-white shadow rounded-lg p-6">
+            <div className="flex items-center mb-4">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                <span className="text-xl">📊</span>
+              </div>
+              <div>
+                <h3 className="text-lg font-medium text-gray-900">Relatório de Leads</h3>
+                <p className="text-sm text-gray-500">Exportar todos os leads e conversas</p>
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h4 className="font-medium text-gray-900 mb-2">Conteúdo do Relatório:</h4>
+                <ul className="text-sm text-gray-600 space-y-1">
+                  <li>• Dados completos dos leads</li>
+                  <li>• Nível de interesse e qualificação</li>
+                  <li>• Histórico de mensagens</li>
+                  <li>• Status de agendamentos</li>
+                  <li>• Datas de primeiro e último contato</li>
+                </ul>
+              </div>
+              
+              <button
+                onClick={downloadLeadsReport}
+                disabled={isGenerating}
+                className={`w-full px-4 py-3 rounded-lg font-medium transition-colors ${
+                  isGenerating 
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                }`}
+              >
+                {isGenerating ? (
+                  <span className="flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Gerando...
+                  </span>
+                ) : (
+                  '📥 Baixar Relatório de Leads'
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Relatório de Agendamentos */}
+          <div className="bg-white shadow rounded-lg p-6">
+            <div className="flex items-center mb-4">
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
+                <span className="text-xl">📅</span>
+              </div>
+              <div>
+                <h3 className="text-lg font-medium text-gray-900">Relatório de Agendamentos</h3>
+                <p className="text-sm text-gray-500">Exportar agendamentos por período</p>
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Filtrar por Mês (opcional)
+                </label>
+                <input
+                  type="month"
+                  value={selectedMonth}
+                  onChange={(e) => setSelectedMonth(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Deixe em branco para exportar todos os agendamentos
+                </p>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h4 className="font-medium text-gray-900 mb-2">Conteúdo do Relatório:</h4>
+                <ul className="text-sm text-gray-600 space-y-1">
+                  <li>• Informações completas dos agendamentos</li>
+                  <li>• Dados de contato dos clientes</li>
+                  <li>• Status e tipo de consulta</li>
+                  <li>• Observações e notas</li>
+                  <li>• Datas e horários</li>
+                </ul>
+              </div>
+              
+              <button
+                onClick={downloadAppointmentsReport}
+                disabled={isGenerating}
+                className={`w-full px-4 py-3 rounded-lg font-medium transition-colors ${
+                  isGenerating 
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-green-600 text-white hover:bg-green-700'
+                }`}
+              >
+                {isGenerating ? (
+                  <span className="flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Gerando...
+                  </span>
+                ) : (
+                  '📥 Baixar Relatório de Agendamentos'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Informações Adicionais */}
+        <div className="mt-8 bg-white shadow rounded-lg p-6">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">ℹ️ Informações sobre os Relatórios</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h4 className="font-medium text-gray-900 mb-2">Formato dos Arquivos</h4>
+              <ul className="text-sm text-gray-600 space-y-1">
+                <li>• Formato: Excel (.xlsx)</li>
+                <li>• Compatível com Microsoft Excel e Google Sheets</li>
+                <li>• Cabeçalhos formatados e colunas organizadas</li>
+                <li>• Download direto no navegador</li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-medium text-gray-900 mb-2">Frequência Recomendada</h4>
+              <ul className="text-sm text-gray-600 space-y-1">
+                <li>• Relatório de leads: Semanal ou mensal</li>
+                <li>• Relatório de agendamentos: Mensal</li>
+                <li>• Para análises específicas: Conforme necessário</li>
+                <li>• Backup de dados: Quinzenal</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Calendar Component
 const Calendar = () => {
   const [appointments, setAppointments] = useState([]);
