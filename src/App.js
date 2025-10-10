@@ -303,6 +303,52 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
+
+          <div 
+            className={`bg-white overflow-hidden shadow rounded-lg cursor-pointer transition-all hover:shadow-lg transform hover:scale-105 ${
+              activeFilter === "contacted" ? "ring-2 ring-purple-500 shadow-lg" : ""
+            }`}
+            onClick={() => handleFilterClick("contacted")}
+          >
+            <div className="p-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+                    <span className="text-white text-sm font-bold">👤</span>
+                  </div>
+                </div>
+                <div className="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 truncate">Contactados</dt>
+                    <dd className="text-lg font-medium text-gray-900">{stats.human_contacted}</dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div 
+            className={`bg-white overflow-hidden shadow rounded-lg cursor-pointer transition-all hover:shadow-lg transform hover:scale-105 ${
+              activeFilter === "not_contacted" ? "ring-2 ring-orange-500 shadow-lg" : ""
+            }`}
+            onClick={() => handleFilterClick("not_contacted")}
+          >
+            <div className="p-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
+                    <span className="text-white text-sm font-bold">⏳</span>
+                  </div>
+                </div>
+                <div className="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 truncate">Não Contactados</dt>
+                    <dd className="text-lg font-medium text-gray-900">{stats.not_contacted}</dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
