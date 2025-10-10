@@ -787,6 +787,16 @@ function App() {
                         Dashboard
                       </button>
                       <button
+                        onClick={() => setCurrentView("calendar")}
+                        className={`px-3 py-2 rounded ${
+                          currentView === "calendar" 
+                            ? "bg-blue-800" 
+                            : "hover:bg-blue-700"
+                        }`}
+                      >
+                        Calendário
+                      </button>
+                      <button
                         onClick={() => setCurrentView("whatsapp")}
                         className={`px-3 py-2 rounded ${
                           currentView === "whatsapp" 
