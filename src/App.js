@@ -425,6 +425,8 @@ const Dashboard = () => {
                         {activeFilter === "warm" && "⚡"}
                         {activeFilter === "cold" && "❄️"}
                         {activeFilter === "today" && "📅"}
+                        {activeFilter === "contacted" && "👤"}
+                        {activeFilter === "not_contacted" && "⏳"}
                         {activeFilter === "all" && "👥"}
                       </span>
                     </div>
