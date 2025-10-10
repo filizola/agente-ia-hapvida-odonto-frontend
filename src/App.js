@@ -361,6 +361,34 @@ const Dashboard = () => {
             </div>
           </div>
 
+        </div>
+
+        {/* Stats Cards - Segunda Linha */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          {/* Segunda linha: Controle e vendas */}
+          <div 
+            className={`bg-white overflow-hidden shadow rounded-lg cursor-pointer transition-all hover:shadow-lg transform hover:scale-105 ${
+              activeFilter === "contacted" ? "ring-2 ring-purple-500 shadow-lg" : ""
+            }`}
+            onClick={() => handleFilterClick("contacted")}
+          >
+            <div className="p-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+                    <span className="text-white text-sm font-bold">👤</span>
+                  </div>
+                </div>
+                <div className="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 truncate">Contactados</dt>
+                    <dd className="text-lg font-medium text-gray-900">{stats.human_contacted}</dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div 
             className={`bg-white overflow-hidden shadow rounded-lg cursor-pointer transition-all hover:shadow-lg transform hover:scale-105 ${
               activeFilter === "not_contacted" ? "ring-2 ring-orange-500 shadow-lg" : ""
@@ -378,6 +406,52 @@ const Dashboard = () => {
                   <dl>
                     <dt className="text-sm font-medium text-gray-500 truncate">Não Contactados</dt>
                     <dd className="text-lg font-medium text-gray-900">{stats.not_contacted}</dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div 
+            className={`bg-white overflow-hidden shadow rounded-lg cursor-pointer transition-all hover:shadow-lg transform hover:scale-105 ${
+              activeFilter === "sales_closed" ? "ring-2 ring-green-600 shadow-lg" : ""
+            }`}
+            onClick={() => handleFilterClick("sales_closed")}
+          >
+            <div className="p-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
+                    <span className="text-white text-sm font-bold">💰</span>
+                  </div>
+                </div>
+                <div className="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 truncate">Vendas Fechadas</dt>
+                    <dd className="text-lg font-medium text-gray-900">{stats.sales_closed}</dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div 
+            className={`bg-white overflow-hidden shadow rounded-lg cursor-pointer transition-all hover:shadow-lg transform hover:scale-105 ${
+              activeFilter === "no_sale" ? "ring-2 ring-red-500 shadow-lg" : ""
+            }`}
+            onClick={() => handleFilterClick("no_sale")}
+          >
+            <div className="p-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+                    <span className="text-white text-sm font-bold">❌</span>
+                  </div>
+                </div>
+                <div className="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 truncate">Sem Venda</dt>
+                    <dd className="text-lg font-medium text-gray-900">{stats.no_sale}</dd>
                   </dl>
                 </div>
               </div>
