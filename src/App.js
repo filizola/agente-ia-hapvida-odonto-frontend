@@ -624,26 +624,29 @@ const Calendar = () => {
               Limpar Filtros
             </button>
             
-            <div className="mt-6">
-              <h4 className="text-sm font-medium text-gray-900 mb-3">Horários Disponíveis</h4>
-              <div className="grid grid-cols-2 gap-2">
-                {availableSlots.map((slot, index) => (
-                  <button
-                    key={index}
-                    onClick={() => {
-                      setNewAppointment({...newAppointment, preferred_time: slot});
-                      setShowAppointmentModal(true);
-                    }}
-                    className="px-3 py-2 text-sm bg-green-100 text-green-800 rounded hover:bg-green-200 transition-colors"
-                  >
-                    {slot}
-                  </button>
-                ))}
+            {/* Available Slots - only show for date filter */}
+            {filterType === "date" && (
+              <div className="mt-6">
+                <h4 className="text-sm font-medium text-gray-900 mb-3">Horários Disponíveis</h4>
+                <div className="grid grid-cols-2 gap-2">
+                  {availableSlots.map((slot, index) => (
+                    <button
+                      key={index}
+                      onClick={() => {
+                        setNewAppointment({...newAppointment, preferred_time: slot});
+                        setShowAppointmentModal(true);
+                      }}
+                      className="px-3 py-2 text-sm bg-green-100 text-green-800 rounded hover:bg-green-200 transition-colors"
+                    >
+                      {slot}
+                    </button>
+                  ))}
+                </div>
+                {availableSlots.length === 0 && filterType === "date" && (
+                  <p className="text-sm text-gray-500">Nenhum horário disponível</p>
+                )}
               </div>
-              {availableSlots.length === 0 && (
-                <p className="text-sm text-gray-500">Nenhum horário disponível</p>
-              )}
-            </div>
+            )}
 
             <button
               onClick={() => setShowAppointmentModal(true)}
