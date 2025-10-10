@@ -128,15 +128,13 @@ const Dashboard = () => {
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <img 
-                  className="h-10 w-auto" 
-                  src="https://www.hapvida.com.br/site/assets/img/hapvida-logo.svg" 
-                  alt="Hapvida"
-                />
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center">
+                  <span className="text-white text-xl font-bold">🦷</span>
+                </div>
               </div>
               <div className="ml-4">
                 <h1 className="text-2xl font-bold text-gray-900">Agente IA Dental</h1>
-                <p className="text-sm text-gray-500">Sistema de Vendas Hapvida +Odonto</p>
+                <p className="text-sm text-gray-500">Sistema de Vendas de Planos Odontológicos</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
