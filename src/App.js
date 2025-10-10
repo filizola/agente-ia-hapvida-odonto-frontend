@@ -313,47 +313,38 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Plans Info */}
+        {/* Agendamentos Section */}
         <div className="mt-8 bg-white shadow rounded-lg">
           <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-medium text-gray-900">Planos Hapvida +Odonto</h3>
+            <h3 className="text-lg font-medium text-gray-900">Sistema de Agendamentos</h3>
+            <p className="text-sm text-gray-500 mt-1">Gerenciar consultas e atendimentos com clientes</p>
           </div>
           <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                <h4 className="font-semibold text-gray-900 mb-2">Plano Básico</h4>
-                <p className="text-2xl font-bold text-blue-600 mb-3">R$ 29,90/mês</p>
-                <ul className="text-sm text-gray-600 space-y-1">
-                  <li>• Consultas ilimitadas</li>
-                  <li>• Limpeza semestral</li>
-                  <li>• Radiografias</li>
-                  <li>• Urgências sem carência</li>
-                </ul>
-              </div>
-              
-              <div className="border rounded-lg p-4 hover:shadow-md transition-shadow border-blue-500">
-                <h4 className="font-semibold text-gray-900 mb-2">Plano Completo</h4>
-                <p className="text-2xl font-bold text-blue-600 mb-3">R$ 49,90/mês</p>
-                <ul className="text-sm text-gray-600 space-y-1">
-                  <li>• Tudo do plano básico</li>
-                  <li>• Procedimentos estéticos</li>
-                  <li>• Implantes com desconto</li>
-                  <li>• Próteses simples</li>
-                </ul>
-                <div className="mt-2 bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">
-                  Mais Popular
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="text-center p-6 border border-dashed border-gray-300 rounded-lg">
+                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-xl">📅</span>
+                </div>
+                <h4 className="font-medium text-gray-900 mb-2">Agendamentos Automáticos</h4>
+                <p className="text-sm text-gray-600 mb-4">
+                  O agente IA oferece automaticamente agendamento para leads interessados
+                </p>
+                <div className="text-xs text-gray-500">
+                  Horários disponíveis: Seg-Sex 9h às 18h
                 </div>
               </div>
               
-              <div className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                <h4 className="font-semibold text-gray-900 mb-2">Plano Premium</h4>
-                <p className="text-2xl font-bold text-blue-600 mb-3">R$ 79,90/mês</p>
-                <ul className="text-sm text-gray-600 space-y-1">
-                  <li>• Cobertura completa</li>
-                  <li>• Ortodontia incluída</li>
-                  <li>• Cirurgias complexas</li>
-                  <li>• Próteses premium</li>
-                </ul>
+              <div className="text-center p-6 border border-dashed border-gray-300 rounded-lg">
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-xl">👤</span>
+                </div>
+                <h4 className="font-medium text-gray-900 mb-2">Consulta Humana</h4>
+                <p className="text-sm text-gray-600 mb-4">
+                  Leads qualificados são direcionados para consultores especializados
+                </p>
+                <div className="text-xs text-gray-500">
+                  Conversão personalizada para fechamento
+                </div>
               </div>
             </div>
           </div>
