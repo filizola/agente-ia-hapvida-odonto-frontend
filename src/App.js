@@ -151,7 +151,12 @@ const Dashboard = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
-          <div className="bg-white overflow-hidden shadow rounded-lg">
+          <div 
+            className={`bg-white overflow-hidden shadow rounded-lg cursor-pointer transition-all hover:shadow-lg transform hover:scale-105 ${
+              activeFilter === "all" ? "ring-2 ring-blue-500 shadow-lg" : ""
+            }`}
+            onClick={() => handleFilterClick("all")}
+          >
             <div className="p-5">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
@@ -169,7 +174,12 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="bg-white overflow-hidden shadow rounded-lg">
+          <div 
+            className={`bg-white overflow-hidden shadow rounded-lg cursor-pointer transition-all hover:shadow-lg transform hover:scale-105 ${
+              activeFilter === "hot" ? "ring-2 ring-red-500 shadow-lg" : ""
+            }`}
+            onClick={() => handleFilterClick("hot")}
+          >
             <div className="p-5">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
@@ -187,7 +197,12 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="bg-white overflow-hidden shadow rounded-lg">
+          <div 
+            className={`bg-white overflow-hidden shadow rounded-lg cursor-pointer transition-all hover:shadow-lg transform hover:scale-105 ${
+              activeFilter === "warm" ? "ring-2 ring-yellow-500 shadow-lg" : ""
+            }`}
+            onClick={() => handleFilterClick("warm")}
+          >
             <div className="p-5">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
@@ -205,7 +220,12 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="bg-white overflow-hidden shadow rounded-lg">
+          <div 
+            className={`bg-white overflow-hidden shadow rounded-lg cursor-pointer transition-all hover:shadow-lg transform hover:scale-105 ${
+              activeFilter === "cold" ? "ring-2 ring-blue-300 shadow-lg" : ""
+            }`}
+            onClick={() => handleFilterClick("cold")}
+          >
             <div className="p-5">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
@@ -223,7 +243,12 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="bg-white overflow-hidden shadow rounded-lg">
+          <div 
+            className={`bg-white overflow-hidden shadow rounded-lg cursor-pointer transition-all hover:shadow-lg transform hover:scale-105 ${
+              activeFilter === "today" ? "ring-2 ring-green-500 shadow-lg" : ""
+            }`}
+            onClick={() => handleFilterClick("today")}
+          >
             <div className="p-5">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
