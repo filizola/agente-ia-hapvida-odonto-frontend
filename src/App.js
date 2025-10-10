@@ -364,6 +364,8 @@ const Dashboard = () => {
                       {activeFilter === "warm" && "Leads Mornos ⚡"}
                       {activeFilter === "cold" && "Leads Frios ❄️"}
                       {activeFilter === "today" && "Leads de Hoje 📅"}
+                      {activeFilter === "contacted" && "Leads Contactados 👤"}
+                      {activeFilter === "not_contacted" && "Leads Não Contactados ⏳"}
                     </h3>
                     <p className="text-sm text-gray-500">
                       {filteredLeads.length} lead{filteredLeads.length !== 1 ? 's' : ''} 
