@@ -149,6 +149,38 @@ const Dashboard = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Filter Indicator */}
+        {activeFilter !== "all" && (
+          <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <span className="text-blue-600 mr-2">
+                  {activeFilter === "hot" && "🔥"}
+                  {activeFilter === "warm" && "⚡"}
+                  {activeFilter === "cold" && "❄️"}
+                  {activeFilter === "today" && "📅"}
+                </span>
+                <span className="text-blue-800 font-medium">
+                  Exibindo apenas: {" "}
+                  {activeFilter === "hot" && "Leads Quentes"}
+                  {activeFilter === "warm" && "Leads Mornos"}
+                  {activeFilter === "cold" && "Leads Frios"}
+                  {activeFilter === "today" && "Leads de Hoje"}
+                </span>
+                <span className="ml-2 bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm">
+                  {filteredLeads.length} encontrado{filteredLeads.length !== 1 ? 's' : ''}
+                </span>
+              </div>
+              <button
+                onClick={() => handleFilterClick("all")}
+                className="text-blue-600 hover:text-blue-800 text-sm underline"
+              >
+                Limpar filtro
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
           <div 
