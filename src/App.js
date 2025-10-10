@@ -328,7 +328,35 @@ const Dashboard = () => {
                       </div>
                     </div>
                   </div>
-                ))}
+                ))
+                ) : (
+                  <div className="px-6 py-12 text-center text-gray-500">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <span className="text-2xl">
+                        {activeFilter === "hot" && "🔥"}
+                        {activeFilter === "warm" && "⚡"}
+                        {activeFilter === "cold" && "❄️"}
+                        {activeFilter === "today" && "📅"}
+                        {activeFilter === "all" && "👥"}
+                      </span>
+                    </div>
+                    <p>
+                      {activeFilter === "all" && "Nenhum lead cadastrado"}
+                      {activeFilter === "hot" && "Nenhum lead quente encontrado"}
+                      {activeFilter === "warm" && "Nenhum lead morno encontrado"}
+                      {activeFilter === "cold" && "Nenhum lead frio encontrado"}
+                      {activeFilter === "today" && "Nenhum lead criado hoje"}
+                    </p>
+                    {activeFilter !== "all" && (
+                      <button
+                        onClick={() => handleFilterClick("all")}
+                        className="mt-3 text-sm text-blue-600 hover:text-blue-800 underline"
+                      >
+                        Ver todos os leads
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>
