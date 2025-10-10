@@ -448,6 +448,8 @@ const WhatsAppSetup = () => {
 const Calendar = () => {
   const [appointments, setAppointments] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedMonth, setSelectedMonth] = useState("");
+  const [filterType, setFilterType] = useState("date"); // "date" or "month"
   const [availableSlots, setAvailableSlots] = useState([]);
   const [showAppointmentModal, setShowAppointmentModal] = useState(false);
   const [newAppointment, setNewAppointment] = useState({
@@ -461,13 +463,22 @@ const Calendar = () => {
 
   useEffect(() => {
     fetchAppointments();
-    fetchAvailableSlots();
-  }, [selectedDate]);
+    if (filterType === "date") {
+      fetchAvailableSlots();
+    }
+  }, [selectedDate, selectedMonth, filterType]);
 
   const fetchAppointments = async () => {
     try {
-      const dateStr = selectedDate.toISOString().split('T')[0];
-      const response = await axios.get(`${API}/appointments?date=${dateStr}`);
+      let url = `${API}/appointments`;
+      if (filterType === "date") {
+        const dateStr = selectedDate.toISOString().split('T')[0];
+        url += `?date=${dateStr}`;
+      } else if (filterType === "month" && selectedMonth) {
+        url += `?month=${selectedMonth}`;
+      }
+      
+      const response = await axios.get(url);
       setAppointments(response.data);
     } catch (error) {
       console.error("Erro ao buscar agendamentos:", error);
