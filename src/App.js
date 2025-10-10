@@ -436,6 +436,22 @@ const Dashboard = () => {
                             {lead.plan_interest}
                           </span>
                         )}
+                        <button
+                          onClick={(e) => toggleHumanContact(lead.id, lead.human_contacted, e)}
+                          className={`text-xs px-2 py-1 rounded transition-colors ${
+                            lead.human_contacted 
+                              ? "bg-purple-100 text-purple-800 hover:bg-purple-200" 
+                              : "bg-orange-100 text-orange-800 hover:bg-orange-200"
+                          }`}
+                          title={lead.human_contacted ? "Marcar como não contactado" : "Marcar como contactado"}
+                        >
+                          {lead.human_contacted ? "✅ Contactado" : "⏳ Não contactado"}
+                        </button>
+                        {lead.human_contacted && lead.human_contact_date && (
+                          <span className="text-xs text-gray-400">
+                            Contactado em {formatDate(lead.human_contact_date)}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
