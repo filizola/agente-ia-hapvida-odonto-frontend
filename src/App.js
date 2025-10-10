@@ -129,6 +129,39 @@ const Dashboard = () => {
     }
   };
 
+  const toggleSaleStatus = async (leadId, currentStatus, event) => {
+    event.stopPropagation(); // Evitar que o click do lead seja acionado
+    
+    try {
+      let notes = null;
+      let amount = null;
+      
+      if (!currentStatus) {
+        notes = prompt("Observações sobre a venda (opcional):");
+        const amountStr = prompt("Valor da venda (opcional, ex: 149.90):");
+        if (amountStr && !isNaN(parseFloat(amountStr))) {
+          amount = parseFloat(amountStr);
+        }
+      }
+      
+      await axios.put(`${API}/leads/${leadId}/sale`, {
+        sale_closed: !currentStatus,
+        notes: notes || undefined,
+        sale_amount: amount || undefined
+      });
+      
+      // Atualizar os dados
+      await fetchDashboardData();
+      
+      const statusText = !currentStatus ? "marcado como venda fechada" : "desmarcado como venda";
+      alert(`Lead ${statusText} com sucesso!`);
+      
+    } catch (error) {
+      console.error("Erro ao atualizar venda:", error);
+      alert("Erro ao atualizar status de venda");
+    }
+  };
+
   const getInterestColor = (level) => {
     switch (level) {
       case "hot": return "text-red-600 bg-red-100";
