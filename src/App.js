@@ -272,10 +272,33 @@ const Dashboard = () => {
           <div className="lg:col-span-1">
             <div className="bg-white shadow rounded-lg">
               <div className="px-6 py-4 border-b border-gray-200">
-                <h3 className="text-lg font-medium text-gray-900">Leads Recentes</h3>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-900">
+                      {activeFilter === "all" && "Todos os Leads"}
+                      {activeFilter === "hot" && "Leads Quentes 🔥"}
+                      {activeFilter === "warm" && "Leads Mornos ⚡"}
+                      {activeFilter === "cold" && "Leads Frios ❄️"}
+                      {activeFilter === "today" && "Leads de Hoje 📅"}
+                    </h3>
+                    <p className="text-sm text-gray-500">
+                      {filteredLeads.length} lead{filteredLeads.length !== 1 ? 's' : ''} 
+                      {activeFilter !== "all" && ` filtrado${filteredLeads.length !== 1 ? 's' : ''}`}
+                    </p>
+                  </div>
+                  {activeFilter !== "all" && (
+                    <button
+                      onClick={() => handleFilterClick("all")}
+                      className="px-3 py-1 text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-md transition-colors"
+                    >
+                      Ver Todos
+                    </button>
+                  )}
+                </div>
               </div>
               <div className="divide-y divide-gray-200 max-h-96 overflow-y-auto">
-                {leads.map((lead) => (
+                {filteredLeads.length > 0 ? (
+                  filteredLeads.map((lead) => (
                   <div
                     key={lead.id}
                     className={`px-6 py-4 hover:bg-gray-50 cursor-pointer transition-colors ${
