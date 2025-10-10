@@ -597,6 +597,8 @@ const Dashboard = () => {
                       {activeFilter === "today" && "Nenhum lead criado hoje"}
                       {activeFilter === "contacted" && "Nenhum lead foi contactado ainda"}
                       {activeFilter === "not_contacted" && "Todos os leads já foram contactados"}
+                      {activeFilter === "sales_closed" && "Nenhuma venda fechada ainda"}
+                      {activeFilter === "no_sale" && "Todas as vendas foram fechadas"}
                     </p>
                     {activeFilter !== "all" && (
                       <button
