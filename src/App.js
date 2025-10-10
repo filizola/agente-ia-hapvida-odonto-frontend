@@ -16,6 +16,8 @@ const Dashboard = () => {
     today_leads: 0
   });
   const [leads, setLeads] = useState([]);
+  const [filteredLeads, setFilteredLeads] = useState([]);
+  const [activeFilter, setActiveFilter] = useState("all");
   const [selectedLead, setSelectedLead] = useState(null);
   const [conversation, setConversation] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -23,6 +25,10 @@ const Dashboard = () => {
   useEffect(() => {
     fetchDashboardData();
   }, []);
+
+  useEffect(() => {
+    filterLeads();
+  }, [leads, activeFilter]);
 
   const fetchDashboardData = async () => {
     try {
@@ -38,6 +44,36 @@ const Dashboard = () => {
       console.error("Erro ao buscar dados:", error);
       setLoading(false);
     }
+  };
+
+  const filterLeads = () => {
+    let filtered = leads;
+    
+    switch (activeFilter) {
+      case "hot":
+        filtered = leads.filter(lead => lead.interest_level === "hot");
+        break;
+      case "warm":
+        filtered = leads.filter(lead => lead.interest_level === "warm");
+        break;
+      case "cold":
+        filtered = leads.filter(lead => lead.interest_level === "cold");
+        break;
+      case "today":
+        const today = new Date().toISOString().split('T')[0];
+        filtered = leads.filter(lead => lead.created_at.startsWith(today));
+        break;
+      default:
+        filtered = leads;
+    }
+    
+    setFilteredLeads(filtered);
+  };
+
+  const handleFilterClick = (filterType) => {
+    setActiveFilter(filterType);
+    setSelectedLead(null);
+    setConversation(null);
   };
 
   const fetchConversation = async (leadId) => {
