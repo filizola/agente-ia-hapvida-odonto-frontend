@@ -341,7 +341,7 @@ const Dashboard = () => {
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
                         <p className="text-sm font-medium text-gray-900">
-                          {lead.name || `Lead ${lead.phone_number.slice(-4)}`}
+                          {lead.name || `Cliente ${lead.phone_number.slice(-4)}`}
                         </p>
                         <p className="text-sm text-gray-500">{lead.phone_number}</p>
                         <p className="text-xs text-gray-400 mt-1">
