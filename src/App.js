@@ -586,6 +586,8 @@ const Dashboard = () => {
                         {activeFilter === "today" && "📅"}
                         {activeFilter === "contacted" && "👤"}
                         {activeFilter === "not_contacted" && "⏳"}
+                        {activeFilter === "sales_closed" && "💰"}
+                        {activeFilter === "no_sale" && "❌"}
                         {activeFilter === "all" && "👥"}
                       </span>
                     </div>
