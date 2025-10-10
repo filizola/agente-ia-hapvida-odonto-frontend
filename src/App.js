@@ -73,6 +73,12 @@ const Dashboard = () => {
       case "not_contacted":
         filtered = leads.filter(lead => lead.human_contacted !== true);
         break;
+      case "sales_closed":
+        filtered = leads.filter(lead => lead.sale_closed === true);
+        break;
+      case "no_sale":
+        filtered = leads.filter(lead => lead.sale_closed !== true);
+        break;
       default:
         filtered = leads;
     }
