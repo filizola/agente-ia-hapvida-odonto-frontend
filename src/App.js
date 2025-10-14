@@ -2,9 +2,202 @@ import React, { useState, useEffect } from "react";
 import "@/App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import axios from "axios";
+import { Mail, Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
+
+// Evitar o intersticial de segurança do ngrok nas requisições XHR/fetch
+// Referência: enviar cabeçalho "ngrok-skip-browser-warning" em todas as chamadas
+axios.defaults.headers.common["ngrok-skip-browser-warning"] = "true";
+
+// Admin Users Component
+const AdminUsers = ({ currentUser }) => {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [newUser, setNewUser] = useState({ name: "", email: "", role: "user", password: "" });
+
+  const fetchUsers = async () => {
+    try {
+      const res = await axios.get(`${API}/users`);
+      setUsers(res.data || []);
+    } catch (err) {
+      console.error("Erro ao listar usuários", err);
+      alert("Erro ao listar usuários");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const createUser = async (e) => {
+    e.preventDefault();
+    try {
+      if (!newUser.password) {
+        alert("Defina uma senha para o novo usuário");
+        return;
+      }
+      const payload = { ...newUser };
+      const res = await axios.post(`${API}/users`, payload);
+      if (res.data?.success) {
+        setNewUser({ name: "", email: "", role: "user", password: "" });
+        await fetchUsers();
+        alert("Usuário criado com sucesso");
+      }
+    } catch (err) {
+      console.error("Erro ao criar usuário", err);
+      alert(err.response?.data?.detail || "Erro ao criar usuário");
+    }
+  };
+
+  const toggleActive = async (user) => {
+    try {
+      const res = await axios.put(`${API}/users/${user.id}`, { is_active: !user.is_active });
+      await fetchUsers();
+      alert(`Usuário ${res.data.is_active ? "desbloqueado" : "bloqueado"} com sucesso`);
+    } catch (err) {
+      console.error("Erro ao atualizar usuário", err);
+      alert("Erro ao atualizar usuário");
+    }
+  };
+
+  const changeRole = async (user, newRole) => {
+    try {
+      await axios.put(`${API}/users/${user.id}`, { role: newRole });
+      await fetchUsers();
+      alert("Perfil atualizado com sucesso");
+    } catch (err) {
+      console.error("Erro ao atualizar perfil", err);
+      alert("Erro ao atualizar perfil");
+    }
+  };
+
+  const deleteUser = async (user) => {
+    if (!window.confirm(`Excluir usuário ${user.name || user.email}?`)) return;
+    try {
+      await axios.delete(`${API}/users/${user.id}`);
+      await fetchUsers();
+      alert("Usuário excluído");
+    } catch (err) {
+      console.error("Erro ao excluir usuário", err);
+      alert("Erro ao excluir usuário");
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="p-8">
+        <p className="text-gray-600">Carregando usuários...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <h2 className="text-2xl font-bold mb-4">Administração de Usuários</h2>
+
+      <div className="bg-white rounded-lg shadow p-6 mb-8">
+        <h3 className="text-lg font-semibold mb-4">Criar novo usuário</h3>
+        <form onSubmit={createUser} className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <input
+            type="text"
+            placeholder="Nome"
+            value={newUser.name}
+            onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+            className="px-3 py-2 border border-gray-300 rounded-md"
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            value={newUser.email}
+            onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+            className="px-3 py-2 border border-gray-300 rounded-md"
+            required
+          />
+          <input
+            type="password"
+            placeholder="Senha"
+            value={newUser.password}
+            onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+            className="px-3 py-2 border border-gray-300 rounded-md"
+            required
+          />
+          <select
+            value={newUser.role}
+            onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
+            className="px-3 py-2 border border-gray-300 rounded-md"
+          >
+            <option value="user">Usuário</option>
+            <option value="admin">Administrador</option>
+          </select>
+          <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+            Criar usuário
+          </button>
+        </form>
+      </div>
+
+      <div className="bg-white rounded-lg shadow">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Perfil</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Criado em</th>
+              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {users.map((user) => (
+              <tr key={user.id}>
+                <td className="px-6 py-4 whitespace-nowrap">{user.name || "-"}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{user.email}</td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <select
+                    value={user.role || "user"}
+                    onChange={(e) => changeRole(user, e.target.value)}
+                    className="px-2 py-1 border rounded"
+                  >
+                    <option value="user">Usuário</option>
+                    <option value="admin">Administrador</option>
+                  </select>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {user.is_active ? (
+                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Ativo</span>
+                  ) : (
+                    <span className="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs">Bloqueado</span>
+                  )}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {user.created_at ? new Date(user.created_at).toLocaleString("pt-BR") : "-"}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                  <button
+                    onClick={() => toggleActive(user)}
+                    className={`px-3 py-1 rounded ${user.is_active ? "bg-yellow-500 hover:bg-yellow-600 text-white" : "bg-green-600 hover:bg-green-700 text-white"}`}
+                  >
+                    {user.is_active ? "Bloquear" : "Desbloquear"}
+                  </button>
+                  <button
+                    onClick={() => deleteUser(user)}
+                    className="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white"
+                  >
+                    Excluir
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
 
 // Dashboard Component
 const Dashboard = () => {
@@ -25,6 +218,11 @@ const Dashboard = () => {
   const [selectedLead, setSelectedLead] = useState(null);
   const [conversation, setConversation] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(null);
+  const [lastFetchAt, setLastFetchAt] = useState(null);
+  const [leadsResponseStatus, setLeadsResponseStatus] = useState(null);
+  const [rawLeadsType, setRawLeadsType] = useState(null);
+  const [rawLeadsCount, setRawLeadsCount] = useState(null);
 
   useEffect(() => {
     fetchDashboardData();
@@ -35,6 +233,7 @@ const Dashboard = () => {
   }, [leads, activeFilter]);
 
   const fetchDashboardData = async () => {
+    setLoading(true);
     try {
       const [statsResponse, leadsResponse] = await Promise.all([
         axios.get(`${API}/dashboard/stats`),
@@ -42,48 +241,60 @@ const Dashboard = () => {
       ]);
       
       setStats(statsResponse.data);
-      setLeads(leadsResponse.data);
+      setLeads(Array.isArray(leadsResponse.data) ? leadsResponse.data : []);
+      setLeadsResponseStatus(leadsResponse.status ?? null);
+      const raw = leadsResponse.data;
+      const type = Array.isArray(raw) ? 'array' : typeof raw;
+      const count = Array.isArray(raw) ? raw.length : 0;
+      setRawLeadsType(type);
+      setRawLeadsCount(count);
+      setFetchError(!Array.isArray(raw) ? 'Resposta de /leads não é um array' : null);
+      setLastFetchAt(new Date().toISOString());
       setLoading(false);
     } catch (error) {
       console.error("Erro ao buscar dados:", error);
+      setFetchError(error?.response ? `HTTP ${error.response.status}: ${error.response.statusText || 'Erro na API'}` : (error?.message || 'Erro desconhecido'));
+      setLeadsResponseStatus(error?.response?.status ?? null);
+      setLastFetchAt(new Date().toISOString());
       setLoading(false);
     }
   };
 
   const filterLeads = () => {
-    let filtered = leads;
+    const base = Array.isArray(leads) ? leads : [];
+    let filtered = base;
     
     switch (activeFilter) {
       case "hot":
-        filtered = leads.filter(lead => lead.interest_level === "hot");
+        filtered = base.filter(lead => lead.interest_level === "hot");
         break;
       case "warm":
-        filtered = leads.filter(lead => lead.interest_level === "warm");
+        filtered = base.filter(lead => lead.interest_level === "warm");
         break;
       case "cold":
-        filtered = leads.filter(lead => lead.interest_level === "cold");
+        filtered = base.filter(lead => lead.interest_level === "cold");
         break;
       case "today":
         const today = new Date().toISOString().split('T')[0];
-        filtered = leads.filter(lead => lead.created_at.startsWith(today));
+        filtered = base.filter(lead => lead.created_at && lead.created_at.startsWith(today));
         break;
       case "contacted":
-        filtered = leads.filter(lead => lead.human_contacted === true);
+        filtered = base.filter(lead => lead.human_contacted === true);
         break;
       case "not_contacted":
-        filtered = leads.filter(lead => lead.human_contacted !== true);
+        filtered = base.filter(lead => lead.human_contacted !== true);
         break;
       case "sales_closed":
-        filtered = leads.filter(lead => lead.sale_closed === true);
+        filtered = base.filter(lead => lead.sale_closed === true);
         break;
       case "no_sale":
-        filtered = leads.filter(lead => lead.sale_closed !== true);
+        filtered = base.filter(lead => lead.sale_closed !== true);
         break;
       default:
-        filtered = leads;
+        filtered = base;
     }
     
-    setFilteredLeads(filtered);
+    setFilteredLeads(Array.isArray(filtered) ? filtered : []);
   };
 
   const handleFilterClick = (filterType) => {
@@ -636,6 +847,53 @@ const Dashboard = () => {
                         Ver todos os leads
                       </button>
                     )}
+
+                    {/* Diagnóstico quando lista vazia no filtro ALL */}
+                    {activeFilter === "all" && (
+                      <div className="mt-6 text-left bg-gray-50 border border-gray-200 rounded p-4 max-w-xl mx-auto">
+                        <div className="flex items-center mb-2 text-gray-700">
+                          <AlertCircle className="w-4 h-4 mr-2" />
+                          <span className="font-medium">Diagnóstico</span>
+                        </div>
+                        <ul className="text-sm text-gray-600 space-y-1">
+                          <li><span className="text-gray-500">Backend:</span> {BACKEND_URL || 'não definido'}</li>
+                          <li><span className="text-gray-500">Endpoint:</span> {`${API}/leads`}</li>
+                          <li><span className="text-gray-500">Status /leads:</span> {leadsResponseStatus ?? '—'}</li>
+                          <li><span className="text-gray-500">Tipo resposta:</span> {rawLeadsType ?? '—'}</li>
+                          <li><span className="text-gray-500">Contagem recebida:</span> {rawLeadsCount ?? 0}</li>
+                          <li><span className="text-gray-500">Última atualização:</span> {lastFetchAt ? new Date(lastFetchAt).toLocaleString() : '—'}</li>
+                          {fetchError && (
+                            <li className="text-red-600"><span className="text-gray-500">Erro:</span> {fetchError}</li>
+                          )}
+                        </ul>
+                        {Array.isArray(leads) && leads.length > 0 && filteredLeads.length === 0 && (
+                          <div className="mt-3 bg-white border border-gray-200 rounded p-3">
+                            <div className="text-sm text-gray-700 font-medium mb-2">Amostra (2 primeiros itens):</div>
+                            <ul className="text-sm text-gray-700 list-disc pl-5 space-y-1">
+                              {leads.slice(0, 2).map((l, i) => (
+                                <li key={l.id || i}>
+                                  {(l.name || (l.phone_number ? `Cliente ${l.phone_number.slice(-4)}` : `Lead ${i+1}`))}
+                                  {" — "}
+                                  {l.phone_number || 'sem telefone'}
+                                  {l.created_at && (
+                                    <span className="text-gray-500"> ({new Date(l.created_at).toLocaleString()})</span>
+                                  )}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        <div className="mt-3">
+                          <button
+                            onClick={fetchDashboardData}
+                            className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+                            disabled={loading}
+                          >
+                            {loading ? 'Recarregando…' : 'Recarregar'}
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -723,7 +981,7 @@ const Dashboard = () => {
                   O agente IA oferece automaticamente agendamento para leads interessados
                 </p>
                 <div className="text-xs text-gray-500">
-                  Horários disponíveis: Seg-Sex 9h às 18h
+                  Horários disponíveis: Segunda a sexta, das 09:00 às 17:00
                 </div>
               </div>
               
@@ -1730,12 +1988,48 @@ const Calendar = () => {
 // Main App Component
 function App() {
   const [currentView, setCurrentView] = useState("dashboard");
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const raw = localStorage.getItem("auth:user");
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  });
+  const [token, setToken] = useState(() => localStorage.getItem("auth:token") || "");
+
+  useEffect(() => {
+    if (token) {
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    } else {
+      delete axios.defaults.headers.common["Authorization"];
+    }
+  }, [token]);
+
+  const handleLogin = (user, tok) => {
+    setCurrentUser(user);
+    setToken(tok);
+    localStorage.setItem("auth:user", JSON.stringify(user));
+    localStorage.setItem("auth:token", tok);
+    setCurrentView("dashboard");
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    setToken("");
+    localStorage.removeItem("auth:user");
+    localStorage.removeItem("auth:token");
+    setCurrentView("dashboard");
+  };
 
   return (
     <div className="App">
       <BrowserRouter>
         <Routes>
           <Route path="/" element={
+            !currentUser ? (
+              <Login onLogin={handleLogin} />
+            ) : (
             <div>
               {/* Navigation */}
               <nav className="bg-blue-600 text-white p-4">
@@ -1743,6 +2037,18 @@ function App() {
                   <div className="flex items-center space-x-8">
                     <h1 className="text-xl font-bold">Agente IA Dental</h1>
                     <div className="flex space-x-4">
+                      {currentUser?.role === "admin" && (
+                        <button
+                          onClick={() => setCurrentView("admin")}
+                          className={`px-3 py-2 rounded ${
+                            currentView === "admin" 
+                              ? "bg-blue-800" 
+                              : "hover:bg-blue-700"
+                          }`}
+                        >
+                          Administração
+                        </button>
+                      )}
                       <button
                         onClick={() => setCurrentView("dashboard")}
                         className={`px-3 py-2 rounded ${
@@ -1793,6 +2099,25 @@ function App() {
                       >
                         WhatsApp Setup
                       </button>
+                      {!currentUser ? (
+                        <button
+                          onClick={() => setCurrentView("login")}
+                          className={`px-3 py-2 rounded ${
+                            currentView === "login" 
+                              ? "bg-blue-800" 
+                              : "hover:bg-blue-700"
+                          }`}
+                        >
+                          Login
+                        </button>
+                      ) : (
+                        <button
+                          onClick={handleLogout}
+                          className="px-3 py-2 rounded bg-red-600 hover:bg-red-700 text-white"
+                        >
+                          sair
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -1804,7 +2129,10 @@ function App() {
               {currentView === "plans" && <PlansManager />}
               {currentView === "reports" && <Reports />}
               {currentView === "whatsapp" && <WhatsAppSetup />}
+              {currentView === "admin" && <AdminUsers currentUser={currentUser} />}
+              {currentView === "login" && <Login onLogin={handleLogin} />}
             </div>
+            )
           }>
             <Route index element={<Dashboard />} />
           </Route>
@@ -1815,3 +2143,130 @@ function App() {
 }
 
 export default App;
+// Login Component
+const Login = ({ onLogin }) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    // validação simples customizada
+    let valid = true;
+    setEmailError("");
+    setPasswordError("");
+    if (!email) {
+      setEmailError("email obrigatorio");
+      valid = false;
+    }
+    if (!password) {
+      setPasswordError("senha obrigatoria");
+      valid = false;
+    }
+    if (!valid) return;
+    setLoading(true);
+    try {
+      const res = await axios.post(`${API}/auth/login`, { email, password });
+      if (res.data?.token && res.data?.user) {
+        onLogin(res.data.user, res.data.token);
+      } else {
+        alert("usuario e senha invalido");
+      }
+    } catch (err) {
+      if (err?.response?.status === 401) {
+        alert("usuario e senha invalido");
+      } else {
+        alert("Erro ao fazer login");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-6">
+      <div className="bg-white/90 backdrop-blur p-10 rounded-2xl shadow-xl border border-gray-200 w-full max-w-md">
+        <h2 className="text-3xl font-bold mb-2 text-gray-900">Login</h2>
+        <p className="text-sm text-gray-600 mb-6">Acesse com seu e-mail e senha</p>
+        <form onSubmit={handleSubmit} noValidate className="space-y-5">
+          <div className="relative">
+            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
+            <input
+              id="login-email"
+              type="email"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (e.target.value) setEmailError("");
+              }}
+              placeholder=" "
+              aria-invalid={!!emailError}
+              aria-describedby={emailError ? "email-error" : undefined}
+              className={`peer w-full pl-10 pr-3 py-3 border rounded-md focus:outline-none focus:ring-2 ${
+                emailError ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
+              } focus:border-transparent`}
+              required
+            />
+            <label htmlFor="login-email" className="absolute left-10 bg-white px-1 text-gray-500 transition-all duration-150 top-0 -translate-y-2.5 scale-90 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-0 peer-focus:-translate-y-2.5 peer-focus:scale-90 peer-focus:text-blue-600">
+              Email
+            </label>
+            {emailError && (
+              <div className="mt-2 flex items-center text-sm text-red-600" id="email-error">
+                <AlertCircle className="h-4 w-4 mr-1" />
+                <span>{emailError}</span>
+              </div>
+            )}
+          </div>
+          <div>
+            <div className="relative">
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
+              <input
+                id="login-password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (e.target.value) setPasswordError("");
+                }}
+                placeholder=" "
+                aria-invalid={!!passwordError}
+                aria-describedby={passwordError ? "password-error" : undefined}
+                className={`peer w-full pl-10 pr-10 py-3 border rounded-md focus:outline-none focus:ring-2 ${
+                  passwordError ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
+                } focus:border-transparent`}
+                required
+              />
+              <label htmlFor="login-password" className="absolute left-10 bg-white px-1 text-gray-500 transition-all duration-150 top-0 -translate-y-2.5 scale-90 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-0 peer-focus:-translate-y-2.5 peer-focus:scale-90 peer-focus:text-blue-600">
+                Senha
+              </label>
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5" />
+                ) : (
+                  <Eye className="h-5 w-5" />
+                )}
+              </button>
+              {passwordError && (
+                <div className="mt-2 flex items-center text-sm text-red-600" id="password-error">
+                  <AlertCircle className="h-4 w-4 mr-1" />
+                  <span>{passwordError}</span>
+                </div>
+              )}
+            </div>
+          </div>
+          <button type="submit" disabled={loading} className="w-full h-10 bg-blue-600 text-white px-4 rounded-md font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            {loading ? "Login..." : "Login"}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
