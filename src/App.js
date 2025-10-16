@@ -4,8 +4,15 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import axios from "axios";
 import { Mail, Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:8000";
 const API = `${BACKEND_URL}/api`;
+// Definir baseURL global para todas as chamadas axios e logar para inspeção
+axios.defaults.baseURL = API;
+// Log simples para facilitar diagnóstico de URL incorreta no runtime
+if (typeof window !== "undefined") {
+  // eslint-disable-next-line no-console
+  console.log("[Frontend] API baseURL:", API);
+}
 
 // Evitar o intersticial de segurança do ngrok nas requisições XHR/fetch
 // Referência: enviar cabeçalho "ngrok-skip-browser-warning" em todas as chamadas
@@ -578,29 +585,6 @@ const Dashboard = () => {
                   <dl>
                     <dt className="text-sm font-medium text-gray-500 truncate">Hoje</dt>
                     <dd className="text-lg font-medium text-gray-900">{stats.today_leads}</dd>
-                  </dl>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div 
-            className={`bg-white overflow-hidden shadow rounded-lg cursor-pointer transition-all hover:shadow-lg transform hover:scale-105 ${
-              activeFilter === "contacted" ? "ring-2 ring-purple-500 shadow-lg" : ""
-            }`}
-            onClick={() => handleFilterClick("contacted")}
-          >
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
-                    <span className="text-white text-sm font-bold">👤</span>
-                  </div>
-                </div>
-                <div className="ml-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">Contactados</dt>
-                    <dd className="text-lg font-medium text-gray-900">{stats.human_contacted}</dd>
                   </dl>
                 </div>
               </div>
