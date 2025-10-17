@@ -4,7 +4,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import axios from "axios";
 import { Mail, Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:8000";
+const DEFAULT_DEV_BACKEND = "http://localhost:8000";
+const DEFAULT_PROD_BACKEND = "https://hapvida-backend.onrender.com";
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || (process.env.NODE_ENV === "production" ? DEFAULT_PROD_BACKEND : DEFAULT_DEV_BACKEND);
 const API = `${BACKEND_URL}/api`;
 // Build info para identificar versão do deploy
 const COMMIT_SHA = process.env.REACT_APP_COMMIT_SHA || "";
