@@ -6,6 +6,9 @@ import { Mail, Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:8000";
 const API = `${BACKEND_URL}/api`;
+// Build info para identificar versão do deploy
+const COMMIT_SHA = process.env.REACT_APP_COMMIT_SHA || "";
+const COMMIT_SHORT = COMMIT_SHA ? COMMIT_SHA.slice(0, 7) : "";
 // Definir baseURL global para todas as chamadas axios e logar para inspeção
 axios.defaults.baseURL = API;
 // Log simples para facilitar diagnóstico de URL incorreta no runtime
@@ -472,6 +475,11 @@ const Dashboard = () => {
             </div>
           </div>
         )}
+
+        {/* Build Version Badge */}
+        <div className="flex justify-end mb-2">
+          <span className="text-xs text-gray-400">Versão: {COMMIT_SHORT || "—"}</span>
+        </div>
 
         {/* Stats Cards - Primeira Linha */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
