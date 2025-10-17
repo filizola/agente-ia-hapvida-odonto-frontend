@@ -2126,7 +2126,6 @@ function App() {
             </div>
             )
           }>
-            <Route index element={<Dashboard />} />
           </Route>
         </Routes>
       </BrowserRouter>
