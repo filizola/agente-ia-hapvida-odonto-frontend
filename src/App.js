@@ -2142,6 +2142,24 @@ const Login = ({ onLogin }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  // Backend connectivity status for local troubleshooting
+  const [backendOk, setBackendOk] = useState(null);
+  const [backendError, setBackendError] = useState("");
+  const [backendInfo, setBackendInfo] = useState(null);
+
+  useEffect(() => {
+    const pingHealth = async () => {
+      try {
+        const res = await axios.get(`${API}/health`);
+        setBackendOk(true);
+        setBackendInfo(res.data || null);
+      } catch (err) {
+        setBackendOk(false);
+        setBackendError(err?.message || "Falha ao conectar ao backend");
+      }
+    };
+    pingHealth();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -2181,7 +2199,23 @@ const Login = ({ onLogin }) => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-6">
       <div className="bg-white/90 backdrop-blur p-10 rounded-2xl shadow-xl border border-gray-200 w-full max-w-md">
         <h2 className="text-3xl font-bold mb-2 text-gray-900">Login</h2>
-        <p className="text-sm text-gray-600 mb-6">Acesse com seu e-mail e senha</p>
+        <p className="text-sm text-gray-600 mb-4">Acesse com seu e-mail e senha</p>
+        {/* Backend status banner for local dev */}
+        {backendOk === false && (
+          <div className="mb-4 rounded-md border border-red-300 bg-red-50 text-red-700 p-3 text-sm">
+            Backend indisponível: verifique REACT_APP_BACKEND_URL e inicialize o backend.
+            <div className="mt-1 text-xs text-red-600">URL atual: {API}</div>
+            {backendError && (
+              <div className="mt-1 text-xs">Erro: {backendError}</div>
+            )}
+          </div>
+        )}
+        {backendOk === true && (
+          <div className="mb-4 rounded-md border border-green-300 bg-green-50 text-green-700 p-3 text-sm">
+            Conectado ao backend
+            <div className="mt-1 text-xs text-green-600">URL: {API}{backendInfo?.app_version ? ` | versão ${backendInfo.app_version}` : ""}</div>
+          </div>
+        )}
         <form onSubmit={handleSubmit} noValidate className="space-y-5">
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
